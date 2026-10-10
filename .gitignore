@@ -147,3 +147,22 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# --- Project-specific additions ---
+# Supabase CLI local link data
+supabase/.temp/
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+*.pem
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local Python / FastAPI artifacts
+__pycache__/
+*.pyc
+.venv/
