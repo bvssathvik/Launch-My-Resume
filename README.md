@@ -1,8 +1,7 @@
-# Launch-My-Resume
-LaunchMyResume is an AI-powered, ATS-focused resume builder. Paste your resume and a job description, pick a template, and get a tailored resume without invented skills or metrics. It gives an ATS match score, missing keywords, and an AI-risk check, then exports PDF, DOCX, or LaTeX
+# Launch-My-CV
+LaunchMyCV is an AI-powered, ATS-focused resume builder. Paste your resume and a job description, pick a template, and get a tailored resume without invented skills or metrics. It gives an ATS match score, missing keywords, and an AI-risk check, then exports PDF, DOCX, or LaTeX
 
-# 🚀 LaunchMyResume
-
+# 🚀 LaunchMyCV
 **AI-powered, ATS-focused resume builder.**
 Paste your resume + a job description → get a tailored, honest, ATS-friendly resume as **PDF, DOCX, or LaTeX**.
 
@@ -14,7 +13,7 @@ Paste your resume + a job description → get a tailored, honest, ATS-friendly r
 ![Groq](https://img.shields.io/badge/AI-Groq-F55036)
 ![Vercel](https://img.shields.io/badge/hosting-Vercel-000000?logo=vercel&logoColor=white)
 
-[Live Demo](#) · [Report a Bug](../../issues) · [Request a Feature](../../issues)
+[Live Demo](https://launchmycv-theta.vercel.app/) · [Report a Bug](../../issues) · [Request a Feature](../../issues)
 
 
 ---
@@ -286,3 +285,4 @@ Some bundled LaTeX template files may carry their own licenses; check their head
 **Sathvik** · GitHub: [@bvssathvik](https://github.com/bvssathvik)
 
 If this project helps you, consider giving it a ⭐.
+
