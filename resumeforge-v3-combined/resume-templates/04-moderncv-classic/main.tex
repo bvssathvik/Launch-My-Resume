@@ -1,0 +1,57 @@
+% ModernCV Classic - faithful article-based implementation (pdflatex-safe).
+% Blue accent (#3873B3), centered name/title header, section headings with
+% underline rules, cvitem-style label:value rows and cventry-style entries.
+% Spacing tuned so headings never crowd the content beneath them.
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor,titlesec,enumitem}
+\usepackage[hidelinks]{hyperref}
+\definecolor{modernblue}{HTML}{3873B3}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1.5pt,topsep=2pt,parsep=0pt,label={\color{modernblue}\textbullet}}
+\titleformat{\section}{\large\bfseries\color{modernblue}}{}{0pt}{}[\vspace{-4pt}{\color{modernblue}\titlerule[0.8pt]}\vspace{7pt}]
+\titlespacing{\section}{0pt}{17pt}{3pt}
+\newcommand{\cvitem}[2]{\noindent\textbf{#1} \hfill {\small #2}\\[1pt]}
+\newcommand{\cventry}[5]{\noindent\textbf{#2} \hfill \textbf{#1}\\[1pt]\textit{#3} \hfill \textit{#4}\\[2pt]}
+\begin{document}
+
+\begin{center}{\fontsize{24}{28}\selectfont\bfseries Alexandra Morgan}\\[2pt]
+{\large\color{modernblue} Senior Software Engineer}\\[4pt]
+\small Seattle, WA \textbar{} +1 555 123 4567 \textbar{} alex.morgan@email.com \textbar{} linkedin.com/in/alexmorgan \textbar{} github.com/alexmorgan
+\end{center}
+\vspace{6pt}
+
+\section{Professional Summary}
+\noindent Product-minded software engineer with 7+ years of experience in reliable systems, product delivery, and engineering-process improvement.
+
+\section{Experience}
+\cventry{2022--Present}{Senior Software Engineer}{CloudScale Inc.}{Seattle, WA}{}
+\begin{itemize}
+\item Led delivery of a customer-facing analytics platform serving 40,000+ daily users, raising uptime from 98.9\% to 99.95\%.
+\item Designed REST and GraphQL APIs handling 2M+ requests per day; cut p95 latency by 45\% and cloud spend by 30\%.
+\item Mentored five engineers and introduced CI/CD with automated testing, shortening release cycles by 60\%.
+\end{itemize}
+\vspace{5pt}
+\cventry{2019--2022}{Software Engineer}{NexaTech Solutions}{San Francisco, CA}{}
+\begin{itemize}
+\item Built full-stack features with React, Node.js, and PostgreSQL; automated deployments with Docker and AWS.
+\item Migrated 12 manual workflows onto automated pipelines, saving an estimated 200 engineer-hours per month.
+\item Delivered a GraphQL service adopted across three product teams.
+\end{itemize}
+\vspace{5pt}
+
+\section{Education}
+\cventry{2015--2019}{B.S. Computer Science}{University of Washington}{Seattle, WA}{}
+\noindent{\small GPA 3.8/4.0}
+
+\section{Technical Skills}
+\cvitem{Languages}{Python, Java, TypeScript, SQL, Go}
+\cvitem{Frameworks}{React, Node.js, Django}
+\cvitem{Cloud \& DevOps}{AWS, Docker, Kubernetes, Terraform, CI/CD}
+\cvitem{Practices}{Testing, APIs, system design, observability, Agile}
+\cvitem{Certifications}{AWS Certified Solutions Architect -- Associate (2023)}
+
+\end{document}

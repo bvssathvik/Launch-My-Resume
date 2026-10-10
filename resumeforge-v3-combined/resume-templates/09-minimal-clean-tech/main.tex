@@ -1,0 +1,60 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=.64in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor,enumitem,titlesec}
+\usepackage[hidelinks]{hyperref}
+\definecolor{accent}{RGB}{75,105,45}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1pt,topsep=2pt,parsep=0pt}
+\titleformat{\section}{\bfseries\large\color{accent}}{}{0pt}{}[\vspace{-4pt}{\color{accent!70}\titlerule[0.5pt]}\vspace{7pt}]
+\titlespacing{\section}{0pt}{16pt}{2pt}
+\begin{document}
+\begin{center}
+{\fontsize{22}{26}\selectfont\bfseries Alexandra Morgan}\\[3pt]
+{\small Seattle, WA \textbar{} +1 555 123 4567 \textbar{} \href{mailto:alex.morgan@email.com}{alex.morgan@email.com} \textbar{} \href{https://www.linkedin.com/in/alexmorgan}{LinkedIn} \textbar{} \href{https://github.com/alexmorgan}{GitHub}}
+\end{center}
+
+\section{Profile}
+\noindent Engineer focused on simple systems, dependable delivery, and thoughtful user outcomes.
+
+\section{Experience}
+\noindent\textbf{Senior Software Engineer} \hfill \textbf{2022--Present}\\
+\textit{CloudScale Inc.} \hfill \textit{Seattle, WA}\\[2pt]
+\begin{itemize}
+\item Led delivery of a customer-facing analytics platform serving 40,000+ daily users, raising uptime from 98.9\% to 99.95\%.
+\item Designed REST and GraphQL APIs handling 2M+ requests per day; cut p95 latency by 45\% and cloud spend by 30\%.
+\item Mentored five engineers and introduced CI/CD with automated testing, shortening release cycles by 60\%.
+\end{itemize}
+\vspace{5pt}
+\noindent\textbf{Software Engineer} \hfill \textbf{2019--2022}\\
+\textit{NexaTech Solutions} \hfill \textit{San Francisco, CA}\\[2pt]
+\begin{itemize}
+\item Built full-stack features with React, Node.js, and PostgreSQL; automated deployments with Docker and AWS.
+\item Migrated 12 manual workflows onto automated pipelines, saving an estimated 200 engineer-hours per month.
+\item Delivered a GraphQL service adopted across three product teams.
+\end{itemize}
+\vspace{5pt}
+\section{Education}
+\noindent\textbf{B.S. Computer Science} \hfill \textbf{2015--2019}\\
+\textit{University of Washington} \hfill \textit{Seattle, WA}\\[2pt]
+{\small GPA 3.8/4.0}
+
+\section{Skills}
+\noindent \textbf{Languages:} Python, Java, TypeScript, SQL, Go\newline \textbf{Frameworks:} React, Node.js, Django\newline \textbf{Cloud \& DevOps:} AWS, Docker, Kubernetes, Terraform, CI/CD\newline \textbf{Practices:} Testing, APIs, system design, observability, Agile
+
+\section{Projects}
+\noindent\textbf{StaCache --- Open-Source Developer Tool}\\[1pt]
+{\small\textit{Python, Docker, GitHub Actions, AWS}}
+\begin{itemize}
+\item Designed and maintain an open-source caching tool with 1,200+ GitHub stars used by 300+ repositories.
+\item Reduced cold-start latency by 40\% in benchmarked and production workloads.
+\end{itemize}
+\vspace{5pt}
+\section{Certifications}
+\begin{itemize}
+\item AWS Certified Solutions Architect -- Associate (2023)
+\end{itemize}
+
+\end{document}

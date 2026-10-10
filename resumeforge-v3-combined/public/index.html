@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Launch your CV — Build a resume the ATS reads and the hiring manager remembers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,460;9..144,600&family=IBM+Plex+Mono:wght@500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ============ TOKENS ============ */
+:root{
+  --ink:#161A1F;
+  --ink-soft:#3A4048;
+  --paper:#F6F4EF;
+  --paper-dim:#EAE7DD;
+  --line:#D7D2C3;
+  --brand:#264A6B;      /* deep cobalt — the one thread through every screen */
+  --brand-deep:#16324A;
+  --brand-tint:#DCE6EE;
+  --gold:#B8873A;        /* wax-seal amber — sparing accent */
+  --good:#3F7A5C;
+  --good-tint:#DEEBE3;
+  --white:#FFFFFF;
+  --shadow: 0 1px 2px rgba(22,26,31,.06), 0 12px 32px -16px rgba(22,26,31,.20);
+  --radius: 3px;
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%;}
+button{font-family:inherit;}
+a{color:inherit;}
+::selection{background:var(--brand-tint);}
+:focus-visible{outline:2px solid var(--brand); outline-offset:2px;}
+
+.visually-hidden{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap;
+}
+.hidden{ display:none !important; }
+.rail-user{ display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+.rail-user button{ background:none; border:none; color:var(--brand); font-family:var(--mono); font-size:12px; cursor:pointer; text-decoration:underline; padding:0; }
+.acct-error{ font-size:12.5px; color:#A2503E; background:#F2E3E0; border-radius:var(--radius); padding:10px 12px; }
+
+/* ============ SHARED SHELL ============ */
+#app{min-height:100vh; display:flex; flex-direction:column;}
+
+.rail{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:1px solid var(--line);
+  background:var(--paper);
+  position:sticky; top:0; z-index:40;
+}
+.rail-brand{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--serif); font-weight:600; font-size:20px; letter-spacing:-0.01em;
+}
+.rail-brand .mark{
+  width:22px;height:22px; border:1.6px solid var(--ink); position:relative; flex:none;
+}
+.rail-brand .mark::after{
+  content:""; position:absolute; left:4px; right:4px; top:6px; height:1.6px; background:var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+}
+.stepper{display:flex; align-items:center; gap:0;}
+.step{
+  display:flex; align-items:center; gap:9px;
+  padding:6px 16px; border:none; background:none; cursor:pointer;
+  font-size:13px; color:var(--ink-soft); font-weight:500;
+}
+.step .num{
+  width:20px;height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:11px; border:1px solid var(--line); flex:none;
+}
+.step[aria-current="step"]{color:var(--ink);}
+.step[aria-current="step"] .num{background:var(--brand); border-color:var(--brand); color:#fff;}
+.step.done .num{background:var(--good); border-color:var(--good); color:#fff;}
+.step-sep{width:24px; height:1px; background:var(--line);}
+.step:disabled{cursor:not-allowed; opacity:.55;}
+
+main{flex:1;}
+.screen{display:none;}
+.screen.active{display:block; animation:rise .5s cubic-bezier(.2,.7,.2,1);}
+@keyframes rise{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion: reduce){ .screen.active{animation:none;} }
+
+/* generic building blocks */
+.eyebrow{ font-family:var(--mono); font-size:12px; color:var(--brand); letter-spacing:.02em; }
+.field{ display:flex; flex-direction:column; gap:7px; }
+.field label{ font-size:13px; font-weight:600; color:var(--ink); }
+.field .hint{ font-size:12px; color:var(--ink-soft); font-weight:400; }
+.field input[type=text], .field input[type=email], .field input[type=password], .field textarea, .field select{
+  font-family:var(--sans); font-size:14.5px; padding:12px 14px;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--white);
+  color:var(--ink); width:100%;
+}
+.field textarea{resize:vertical; min-height:120px; line-height:1.5;}
+.field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--brand); }
+
+.btn{
+  font-family:var(--sans); font-weight:600; font-size:14.5px; cursor:pointer;
+  padding:13px 26px; border-radius:var(--radius); border:1px solid transparent;
+  display:inline-flex; align-items:center; gap:8px; transition:transform .15s ease, background .15s ease;
+}
+.btn:active{ transform:translateY(1px); }
+.btn-primary{ background:var(--brand); color:#fff; }
+.btn-primary:hover{ background:var(--brand-deep); }
+.btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+.btn-ghost:hover{ border-color:var(--ink); }
+.btn-block{ width:100%; justify-content:center; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* =========================================================
+   SCREEN 1 — ACCOUNT (split editorial / form)
+   ========================================================= */
+#screen-account{
+  grid-template-columns: 1.05fr 1fr; min-height: calc(100vh - 73px);
+}
+#screen-account.active{
+  display:grid;
+}
+.acct-editorial{
+  background:var(--ink);
+  color:var(--paper);
+  padding:64px;
+  display:flex; flex-direction:column; justify-content:space-between;
+  position:relative; overflow:hidden;
+}
+.acct-editorial::before{
+  content:""; position:absolute; inset:0;
+  background-image: repeating-linear-gradient(180deg, rgba(246,244,239,.05) 0 1px, transparent 1px 44px);
+  pointer-events:none;
+}
+.acct-editorial .quote{
+  font-family:var(--serif); font-weight:340; font-size:clamp(30px,3.6vw,46px);
+  line-height:1.18; max-width:15ch; letter-spacing:-0.01em; position:relative;
+}
+.acct-editorial .quote em{ font-style:italic; color:#EBD8B8; }
+.acct-stat-row{ display:flex; gap:40px; position:relative; }
+.acct-stat b{ display:block; font-family:var(--serif); font-size:30px; font-weight:600; color:#EBD8B8;}
+.acct-stat span{ font-size:12.5px; color:#B9C0C7; }
+.acct-source{ position:relative; font-size:13px; color:#9AA3AC; }
+
+.acct-form-wrap{
+  display:flex; align-items:center; justify-content:center; padding:64px 48px;
+}
+.acct-form{ width:100%; max-width:380px; }
+.acct-form h1{ font-family:var(--serif); font-size:30px; font-weight:600; margin:6px 0 6px; letter-spacing:-0.01em;}
+.acct-form p.lede{ color:var(--ink-soft); font-size:14.5px; margin:0 0 28px; }
+.acct-tabs{ display:flex; border-bottom:1px solid var(--line); margin-bottom:26px; }
+.acct-tab{
+  background:none; border:none; padding:10px 4px; margin-right:24px; font-size:14px; font-weight:600;
+  color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;
+}
+.acct-tab.active{ color:var(--ink); border-bottom-color:var(--brand); }
+.acct-fields{ display:flex; flex-direction:column; gap:16px; }
+.acct-fine{ font-size:12.5px; color:var(--ink-soft); margin-top:16px; text-align:center; }
+.acct-divider{ display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--ink-soft); font-size:12px; }
+.acct-divider::before,.acct-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+.oauth-row{ display:flex; gap:10px; }
+.oauth-btn{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--white);
+  font-size:13px; font-weight:600; cursor:pointer;
+}
+.oauth-btn:hover{ border-color:var(--ink); }
+
+@media (max-width: 880px){
+  #screen-account{ grid-template-columns:1fr; }
+  .acct-editorial{ display:none; }
+}
+
+/* =========================================================
+   SCREEN 2 — TARGET ROLE (dossier / folder)
+   ========================================================= */
+#screen-role{ background:var(--paper); }
+.role-head{
+  padding:48px 40px 32px; max-width:1100px; margin:0 auto;
+}
+.role-head h1{ font-family:var(--serif); font-size:34px; font-weight:600; letter-spacing:-.01em; margin:10px 0 8px; }
+.role-head p{ color:var(--ink-soft); max-width:56ch; font-size:15px; margin:0; }
+
+.dossier{
+  max-width:1100px; margin: 0 auto 80px; padding:0 40px;
+  display:grid; grid-template-columns: 1fr 1fr; gap:0;
+  border:1px solid var(--line); background:var(--white); box-shadow:var(--shadow);
+}
+.dossier-tab{
+  grid-column:1/-1; display:flex; border-bottom:1px solid var(--line);
+}
+.dossier-tab span{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.03em; color:var(--ink-soft);
+  padding:12px 20px; border-right:1px solid var(--line);
+}
+.dossier-tab span:first-child{ color:var(--brand); background:var(--brand-tint); }
+
+.dossier-col{ padding:32px; display:flex; flex-direction:column; gap:22px; }
+.dossier-col.left{ border-right:1px solid var(--line); }
+
+.upload-zone{
+  border:1.5px dashed var(--line); border-radius:var(--radius); padding:26px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+  background:var(--paper-dim); cursor:pointer; transition:border-color .15s ease, background .15s ease;
+}
+.upload-zone:hover, .upload-zone.drag{ border-color:var(--brand); background:var(--brand-tint); }
+.upload-zone .file-icon{ width:34px; height:34px; }
+.upload-zone .up-title{ font-weight:600; font-size:14.5px; }
+.upload-zone .up-sub{ font-size:12.5px; color:var(--ink-soft); }
+.upload-status{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--good); font-weight:600; }
+.upload-status svg{ width:16px; height:16px; }
+
+.field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width: 720px){
+  .dossier{ grid-template-columns:1fr; }
+  .dossier-col.left{ border-right:none; border-bottom:1px solid var(--line); }
+  .field-row{ grid-template-columns:1fr; }
+}
+
+.role-footer{
+  grid-column:1/-1; display:flex; justify-content:space-between; align-items:center;
+  padding:20px 32px; border-top:1px solid var(--line); background:var(--paper-dim);
+}
+.role-footer .count{ font-size:12.5px; color:var(--ink-soft); font-family:var(--mono); }
+
+/* =========================================================
+   SCREEN 3 — TEMPLATES
+   ========================================================= */
+#screen-templates{ background:var(--ink); color:var(--paper); min-height:100vh; }
+.tpl-head{ padding:56px 40px 20px; max-width:1200px; margin:0 auto; }
+.tpl-head .eyebrow{ color:#EBD8B8; }
+.tpl-head h1{ font-family:var(--serif); font-weight:600; font-size:34px; margin:10px 0 10px; color:var(--paper); letter-spacing:-.01em;}
+.tpl-head p{ color:#B9C0C7; max-width:60ch; font-size:15px; }
+
+.tpl-grid{
+  max-width:1200px; margin:0 auto; padding:24px 40px 90px;
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:22px;
+}
+@media (max-width:1080px){ .tpl-grid{ grid-template-columns:repeat(2,1fr);} }
+@media (max-width:560px){ .tpl-grid{ grid-template-columns:1fr;} }
+
+.tpl-card{
+  background:#1D2229; border:1px solid #2B323B; border-radius:var(--radius);
+  overflow:hidden; cursor:pointer; text-align:left; padding:0; color:inherit;
+  display:flex; flex-direction:column;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.tpl-card:hover{ border-color:#4A5661; transform:translateY(-3px); }
+.tpl-card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+.tpl-preview{
+  background:var(--paper); aspect-ratio:3/4; padding:11px 13px; position:relative;
+}
+.tpl-preview .pl{ background:#C7C2B3; height:6px; border-radius:1px; }
+.tpl-preview .pl.dark{ background:#3A4048; }
+.tpl-preview .pl.brand{ background:var(--brand); }
+.tpl-preview img.tpl-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:2; border-radius:2px; }
+.tpl-preview .tpl-check{ z-index:3; }
+.tpl-meta{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:4px; }
+.tpl-meta .name{ font-weight:600; font-size:14.5px; }
+.tpl-meta .file{ font-family:var(--mono); font-size:11px; color:#8E97A0; }
+.tpl-meta .desc{ font-size:12.5px; color:#B9C0C7; margin-top:2px; line-height:1.4; }
+.tpl-check{
+  position:absolute; top:9px; right:9px; width:20px; height:20px; border-radius:50%;
+  background:var(--gold); color:var(--ink); display:none; align-items:center; justify-content:center;
+}
+.tpl-card.selected .tpl-check{ display:flex; }
+
+/* individual preview glyphs */
+.pv-clean .pl{ margin-bottom:7px; }
+.pv-clean .pl:first-child{ width:52%; height:9px; }
+
+.pv-dual{ display:grid; grid-template-columns: 34% 1fr; gap:8px; height:100%; }
+.pv-dual .side{ background:#EDEAE1; padding:8px 6px; display:flex; flex-direction:column; gap:6px; }
+.pv-dual .main{ display:flex; flex-direction:column; gap:6px; padding-top:2px; }
+
+.pv-exec .pl:first-child{ width:60%; height:10px; margin-bottom:4px; }
+.pv-exec hr{ border:none; border-top:1px solid #C7C2B3; margin:8px 0; }
+
+.pv-faang{ display:flex; flex-direction:column; gap:5px; }
+.pv-faang .tag{ display:inline-block; background:var(--brand-tint); color:var(--brand); font-family:var(--mono); font-size:6.5px; padding:2px 4px; border-radius:2px; margin-right:3px; }
+
+.pv-jakes .pl:first-child{ width:70%; height:9px; margin:0 auto 4px; }
+.pv-jakes{ text-align:center; }
+.pv-jakes hr{ border:none; border-top:1px solid #3A4048; margin:6px 0; }
+
+.pv-modern{ display:flex; flex-direction:column; gap:6px; }
+.pv-modern .band{ height:20px; background:var(--brand); border-radius:1px; margin-bottom:6px; }
+
+.pv-classic .pl:first-child{ width:64%; height:9px; margin-bottom:3px; font-style:italic; }
+.pv-classic .rule{ height:1px; background:#3A4048; margin:6px 0 8px; }
+
+.pv-tech{ display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.pv-tech .chip{ background:#EDEAE1; border-radius:2px; height:8px; }
+
+/* dark-sidebar variant of .pv-dual, for sidebar-style templates */
+.pv-dual.dark-side .side{ background:var(--brand); }
+.pv-dual.dark-side .side .pl{ background:rgba(255,255,255,.55); }
+.pv-dual.dark-side .side .pl.dark{ background:#fff; }
+
+/* boxed "card" sections */
+.pv-card2{ display:flex; flex-direction:column; gap:6px; }
+.pv-card2 .box{ border:1px solid var(--brand); border-radius:2px; padding:5px 6px; display:flex; flex-direction:column; gap:4px; }
+
+/* colored-rule "timeline" variant of .pv-classic */
+.pv-time2 .pl:first-child{ width:60%; height:9px; margin-bottom:3px; }
+.pv-time2 .rule{ height:2px; background:var(--brand); margin:6px 0 8px; border-radius:1px; }
+
+.tpl-cta-bar{
+  position:sticky; bottom:0; background:#1D2229; border-top:1px solid #2B323B;
+  padding:16px 40px; display:flex; justify-content:flex-end; gap:12px;
+}
+
+/* =========================================================
+   SCREEN 4 — RESULT
+   ========================================================= */
+#screen-result{ background:var(--paper-dim); }
+.result-shell{
+  max-width:1180px; margin:0 auto; padding:48px 40px 100px;
+  display:grid; grid-template-columns: 1fr 380px; gap:32px; align-items:start;
+}
+@media (max-width:960px){ .result-shell{ grid-template-columns:1fr; } }
+
+.resume-frame{
+  background:var(--white); border:1px solid var(--line); box-shadow:var(--shadow);
+  aspect-ratio:8.5/11; padding:46px 48px; overflow:hidden; position:relative;
+}
+.resume-frame .rname{ font-family:var(--serif); font-weight:600; font-size:26px; letter-spacing:-.01em; }
+.resume-frame .rrole{ color:var(--brand); font-size:13px; font-weight:600; margin-top:2px; }
+.resume-frame .rcontact{ font-size:11px; color:var(--ink-soft); margin-top:8px; font-family:var(--mono); }
+.resume-frame hr{ border:none; border-top:1px solid var(--line); margin:18px 0; }
+.resume-frame h4{ font-size:11px; letter-spacing:.06em; color:var(--brand); margin:0 0 10px; }
+.resume-frame .rline{ height:6px; background:var(--paper-dim); border-radius:1px; margin-bottom:8px; }
+.resume-frame .rline.s{ width:70%; }
+.resume-toolbar{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;
+}
+.resume-toolbar .fname{ font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); }
+
+.score-card{
+  background:var(--white); border:1px solid var(--line); box-shadow:var(--shadow); padding:28px;
+}
+.score-top{ display:flex; align-items:center; gap:20px; }
+.score-ring{ width:96px; height:96px; flex:none; }
+.score-num{ font-family:var(--serif); font-size:20px; font-weight:600; }
+.score-top .label{ font-size:13px; color:var(--ink-soft); }
+.score-top .verdict{ font-weight:600; color:var(--good); font-size:15px; margin-top:2px; }
+
+.score-bars{ margin-top:24px; display:flex; flex-direction:column; gap:16px; }
+.score-bar-row .top{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px; }
+.score-bar-row .top .k{ font-weight:600; }
+.score-bar-track{ height:6px; background:var(--paper-dim); border-radius:3px; overflow:hidden; }
+.score-bar-fill{ height:100%; background:var(--brand); border-radius:3px; width:0; transition:width 1.1s cubic-bezier(.2,.8,.2,1); }
+.score-bar-fill.good{ background:var(--good); }
+.score-bar-fill.warn{ background:var(--gold); }
+
+.kw-list{ margin-top:22px; }
+.kw-list h5{ font-size:12px; letter-spacing:.03em; color:var(--ink-soft); margin:0 0 10px; }
+.kw{ display:inline-flex; align-items:center; gap:5px; background:var(--good-tint); color:var(--good); font-size:12px; font-weight:600; padding:5px 10px; border-radius:20px; margin:0 6px 6px 0; }
+.kw.missing{ background:#F2E3E0; color:#A2503E; }
+
+.result-actions{ display:flex; gap:10px; margin-top:24px; }
+.result-actions .btn{ flex:1; }
+
+@media print{
+  .rail, .tpl-cta-bar, .result-actions, #screen-result .score-card{ display:none !important; }
+}
+
+/* =========================================================
+   MODAL OVERLAY & WORKSPACE EXPANSIONS
+   ========================================================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(22, 26, 31, 0.82); backdrop-filter: blur(4px);
+  z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-card {
+  background: var(--white); border-radius: 6px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  width: 100%; max-width: 480px; padding: 36px 32px; text-align: center;
+}
+.loader-spinner {
+  width: 44px; height: 44px; border: 4px solid var(--paper-dim); border-top-color: var(--brand);
+  border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.loader-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-soft); }
+.loader-step.active { color: var(--brand); font-weight: 600; }
+.loader-step.done { color: var(--good); font-weight: 600; }
+
+.workspace-tabs {
+  display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin-bottom: 16px; background: var(--paper); border-radius: var(--radius); padding: 4px;
+}
+.ws-tab {
+  padding: 8px 18px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; border-radius: var(--radius); transition: all .15s ease;
+}
+.ws-tab.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+.code-editor {
+  background: #1B1F24; color: #E6EDF3; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+  padding: 20px; border-radius: var(--radius); overflow-x: auto; white-space: pre-wrap; height: 600px; max-height: 650px; border: 1px solid var(--line);
+}
+
+.resume-formatted-doc { text-align: left; }
+.resume-formatted-doc h3 { font-size: 14px; letter-spacing: .05em; color: var(--brand); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin: 20px 0 12px; }
+.job-item { margin-bottom: 14px; }
+.job-item .title-row { display: flex; justify-content: space-between; font-weight: 600; font-size: 14px; }
+.job-item .meta-row { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-soft); font-style: italic; margin: 2px 0 6px; }
+.bullet-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--ink); }
+.bullet-list li { margin-bottom: 4px; }
+.skills-group { margin-bottom: 6px; font-size: 13px; }
+.skills-group strong { font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <nav class="rail" aria-label="Progress">
+    <div class="rail-brand"><span class="mark" aria-hidden="true"></span>Launch your CV</div>
+    <div class="stepper" role="tablist">
+      <button class="step" data-goto="account" aria-current="step"><span class="num">1</span>Account</button>
+      <span class="step-sep" aria-hidden="true"></span>
+      <button class="step" data-goto="role" disabled><span class="num">2</span>Role &amp; resume</button>
+      <span class="step-sep" aria-hidden="true"></span>
+      <button class="step" data-goto="templates" disabled><span class="num">3</span>Template</button>
+      <span class="step-sep" aria-hidden="true"></span>
+      <button class="step" data-goto="result" disabled><span class="num">4</span>Result</button>
+    </div>
+    <div class="rail-user hidden" id="user-chip">
+      <span id="user-email"></span>
+      <button type="button" id="sign-out-btn">Sign out</button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ============ SCREEN 1 — ACCOUNT ============ -->
+    <section id="screen-account" class="screen active">
+      <div class="acct-editorial">
+        <div class="acct-source eyebrow" style="color:#EBD8B8;">LAUNCH YOUR CV</div>
+        <p class="quote">Most resumes lose to a parser<br>before a person ever <em>reads</em> one.</p>
+        <div>
+          <div class="acct-stat-row">
+            <div class="acct-stat"><b>75%</b><span>of resumes are filtered by ATS software first</span></div>
+            <div class="acct-stat"><b>6 sec</b><span>average recruiter glance once you pass it</span></div>
+          </div>
+          <p class="acct-source" style="margin-top:18px;">We tune the document for both readers — the machine and the person.</p>
+        </div>
+      </div>
+
+      <div class="acct-form-wrap">
+        <div class="acct-form">
+          <div class="eyebrow">Step 1 of 4</div>
+          <h1 id="acct-heading">Create your account</h1>
+          <p class="lede">Set up once — your role details, template and score carry through the rest of the build.</p>
+
+          <div class="acct-tabs" role="tablist" aria-label="Account mode">
+            <button class="acct-tab active" data-mode="signup" role="tab" aria-selected="true">Sign up</button>
+            <button class="acct-tab" data-mode="login" role="tab" aria-selected="false">Log in</button>
+          </div>
+
+          <form id="acct-form" class="acct-fields" novalidate>
+            <div class="field" data-only="signup">
+              <label for="fullname">Full name</label>
+              <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Ada Okafor">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="you@domain.com" required>
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8">
+            </div>
+            <p class="acct-error hidden" id="acct-error"></p>
+            <button type="submit" class="btn btn-primary btn-block" id="acct-submit">Create account</button>
+          </form>
+
+          <div class="acct-divider">or continue with</div>
+          <div class="oauth-row">
+            <button class="oauth-btn" type="button" data-provider="google">Google</button>
+          </div>
+          <p class="acct-fine">By continuing you agree to create a Launch your CV account. Your resume text is sent only to your own backend.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 2 — ROLE & RESUME ============ -->
+    <section id="screen-role" class="screen">
+      <div class="role-head">
+        <div class="eyebrow">Step 2 of 4</div>
+        <h1>What are you aiming for?</h1>
+        <p>Give us the job you're pointing at and the resume you have today. We'll rebuild the second around the first.</p>
+      </div>
+
+      <form id="role-form" class="dossier">
+        <div class="dossier-tab">
+          <span>TARGET ROLE</span>
+          <span>SOURCE MATERIAL</span>
+        </div>
+
+        <div class="dossier-col left">
+          <div class="field-row">
+            <div class="field">
+              <label for="job-title">Target job title</label>
+              <input type="text" id="job-title" placeholder="Senior Product Designer" required>
+            </div>
+            <div class="field">
+              <label for="company">Target company</label>
+              <input type="text" id="company" placeholder="e.g. Figma" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="jd">Job description</label>
+            <span class="hint">Paste the full listing — we match its language against your resume.</span>
+            <textarea id="jd" placeholder="Paste the job description here..." required></textarea>
+          </div>
+        </div>
+
+        <div class="dossier-col">
+          <div class="field">
+            <label>Current resume</label>
+            <span class="hint">Upload a .txt / .docx file, or paste your resume text below.</span>
+            <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-describedby="upload-desc">
+              <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <span class="up-title" id="upload-title">Drop your resume here, or click to browse</span>
+              <span class="up-sub" id="upload-desc">.txt, .docx up to 8MB — or paste below</span>
+              <input type="file" id="resume-file" accept=".txt,.pdf,.docx" class="visually-hidden">
+            </div>
+          </div>
+          <div class="field">
+            <label for="resume-text">Or paste resume text <span class="hint" style="font-weight:400;">(plain text)</span></label>
+            <textarea id="resume-text" placeholder="Paste your full resume as plain text here..." style="min-height:160px;"></textarea>
+          </div>
+          <div class="field">
+            <label for="linkedin">LinkedIn or portfolio <span class="hint" style="font-weight:400;">(optional)</span></label>
+            <input type="text" id="linkedin" placeholder="linkedin.com/in/yourname">
+          </div>
+        </div>
+
+        <div class="role-footer">
+          <span class="count" id="jd-count">0 characters</span>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn btn-ghost" data-goto="account">Back</button>
+            <button type="submit" class="btn btn-primary">Continue to templates</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ SCREEN 3 — TEMPLATES ============ -->
+    <section id="screen-templates" class="screen">
+      <div class="tpl-head">
+        <div class="eyebrow">Step 3 of 4</div>
+        <h1>Choose a structure</h1>
+        <p>Every layout below carries the same content model — pick the one that fits your role and industry, not just your taste.</p>
+      </div>
+
+      <div class="tpl-grid" id="tpl-grid">
+
+        
+        <button class="tpl-card" data-tpl="Modern CV">
+          <div class="tpl-preview pv-exec">
+            <div class="pl dark" style="width:60%;height:10px;"></div>
+            <div class="pl" style="width:40%;"></div>
+            <hr>
+            <div class="pl brand" style="width:30%;"></div>
+            <div class="pl" style="width:100%;margin-top:6px;"></div>
+            <div class="pl" style="width:94%;"></div>
+            <hr>
+            <div class="pl brand" style="width:30%;"></div>
+            <div class="pl" style="width:96%;margin-top:6px;"></div>
+            <img class="tpl-img" src="previews/04-moderncv-classic.png" alt="Executive preview">
+            <div class="tpl-check">✓</div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Modern CV</span>
+            <span class="file">ModernCV Classic.ts</span>
+            <span class="desc">Centered header, wide rules, built for 15+ years of scope.</span>
+          </div>
+        </button>
+
+        <button class="tpl-card" data-tpl="Minimal Clean Tech">
+          <div class="tpl-preview pv-clean" style="--brand:#2B2B2B;--brand-tint:#E7E7E7;">
+            <img class="tpl-img" src="previews/09-minimal-clean-tech.png" alt="Minimal Clean Tech preview">
+            <div class="tpl-check">✓</div>
+            <div class="pl dark" style="width:48%;height:9px;"></div>
+            <div class="pl brand" style="width:26%;margin-top:12px;"></div>
+            <div class="pl" style="width:92%;"></div>
+            <div class="pl" style="width:80%;"></div>
+            <div class="pl brand" style="width:26%;margin-top:12px;"></div>
+            <div class="pl" style="width:88%;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Minimal Clean Tech</span>
+            <span class="file">minimal-clean-tech.ts</span>
+            <span class="desc">Dark-gray headers, airy spacing. Calm and confident for mid-level engineers.</span>
+          </div>
+        </button>
+
+        <button class="tpl-card" data-tpl="FAANG-Style Compact">
+          <div class="tpl-preview pv-faang" style="--brand:#333333;--brand-tint:#E6E6E6;">
+            <img class="tpl-img" src="previews/10-faang-style-compact.png" alt="FAANG-Style Compact preview">
+            <div class="tpl-check">✓</div>
+            <div class="pl dark" style="width:56%;height:9px;"></div>
+            <div style="margin:4px 0 6px;"><span class="tag">SHIPPED</span><span class="tag">SCALED</span><span class="tag">OWNED</span></div>
+            <div class="pl brand" style="width:24%;"></div>
+            <div class="pl" style="width:100%;"></div>
+            <div class="pl" style="width:60%;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">FAANG-Style Compact</span>
+            <span class="file">faang-style-compact.ts</span>
+            <span class="desc">Bold uppercase headers under a full rule. Denser than FAANG Path, still monochrome.</span>
+          </div>
+        </button>
+
+        <button class="tpl-card" data-tpl="Bold Header Modern">
+          <div class="tpl-preview pv-modern" style="--brand:#14345A;--brand-tint:#DCE4EE;">
+            <img class="tpl-img" src="previews/12-bold-header-modern.png" alt="Bold Header Modern preview">
+            <div class="tpl-check">✓</div>
+            <div class="band"></div>
+            <div class="pl" style="width:60%;"></div>
+            <div class="pl brand" style="width:30%;margin-top:6px;"></div>
+            <div class="pl" style="width:100%;"></div>
+            <div class="pl" style="width:80%;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Bold Header Modern</span>
+            <span class="file">bold-header-modern.ts</span>
+            <span class="desc">Name/contact reversed out of a solid navy band. Startup and product-facing.</span>
+          </div>
+        </button>
+
+        
+        <button class="tpl-card" data-tpl="Ultra-Clean One-Page">
+          <div class="tpl-preview pv-clean" style="--brand:#3A4048;--brand-tint:#E4E5E6;">
+            <img class="tpl-img" src="previews/13-ultra-clean-one-page.png" alt="Ultra-Clean One-Page preview">
+            <div class="tpl-check">✓</div>
+            <div class="pl dark" style="width:50%;height:8px;margin-bottom:5px;"></div>
+            <div class="pl brand" style="width:20%;margin-top:6px;"></div>
+            <div class="pl" style="width:94%;margin-bottom:4px;"></div>
+            <div class="pl" style="width:86%;margin-bottom:4px;"></div>
+            <div class="pl brand" style="width:20%;margin-top:6px;"></div>
+            <div class="pl" style="width:90%;margin-bottom:4px;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Ultra-Clean One-Page</span>
+            <span class="file">ultra-clean-one-page.ts</span>
+            <span class="desc">Tightest spacing of the set, zero color. Built to fit everything on one page.</span>
+          </div>
+        </button>
+
+        
+        
+        
+        <button class="tpl-card" data-tpl="Tech-Focused Dense">
+          <div class="tpl-preview pv-tech" style="--brand:#2B2B2B;--brand-tint:#E7E7E7;">
+            <img class="tpl-img" src="previews/15-tech-focused-dense.png" alt="Tech-Focused Dense preview">
+            <div class="tpl-check">✓</div>
+            <div class="pl dark" style="grid-column:1/-1;width:52%;height:8px;"></div>
+            <div class="pl brand" style="grid-column:1/-1;width:24%;"></div>
+            <div class="chip"></div><div class="chip"></div><div class="chip"></div><div class="chip"></div>
+            <div class="pl" style="grid-column:1/-1;width:96%;"></div>
+            <div class="pl" style="grid-column:1/-1;width:90%;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Tech-Focused Dense</span>
+            <span class="file">tech-focused-dense.ts</span>
+            <span class="desc">Smallest font, tightest spacing. Monospaced skills line. Maximum density.</span>
+          </div>
+        </button>
+
+        
+        <button class="tpl-card" data-tpl="Premium Minimalist">
+          <div class="tpl-preview pv-exec" style="--brand:#333333;--brand-tint:#E6E6E6;">
+            <div class="pl dark" style="width:56%;height:10px;"></div>
+            <div class="pl" style="width:36%;"></div>
+            <hr>
+            <div class="pl brand" style="width:26%;"></div>
+            <div class="pl" style="width:88%;margin-top:8px;"></div>
+            <hr>
+            <div class="pl brand" style="width:26%;"></div>
+            <div class="pl" style="width:82%;margin-top:8px;"></div>
+            <img class="tpl-img" src="previews/14-premium-minimalist.png" alt="Premium Minimalist preview">
+            <div class="tpl-check">✓</div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Premium Minimalist</span>
+            <span class="file">premium-minimalist.ts</span>
+            <span class="desc">Generous margins, airy line spacing, hairline rules. Unhurried rather than dense.</span>
+          </div>
+        </button>
+
+        <button class="tpl-card" data-tpl="Executive">
+          <div class="tpl-preview pv-classic" style="--brand:#1C2B39;--brand-tint:#D7DCE1;">
+            <img class="tpl-img" src="previews/20-structured-executive-brief.png" alt="Structured Executive Brief preview">
+            <div class="tpl-check">✓</div>
+            <div class="pl dark" style="width:60%;height:9px;"></div>
+            <div class="rule"></div>
+            <div class="pl brand" style="width:28%;"></div>
+            <div class="pl" style="width:96%;margin-top:4px;"></div>
+            <div class="rule"></div>
+            <div class="pl brand" style="width:28%;"></div>
+            <div class="pl" style="width:92%;margin-top:4px;"></div>
+          </div>
+          <div class="tpl-meta">
+            <span class="name">Executive</span>
+            <span class="file">structured-executive-brief.ts</span>
+            <span class="desc">Centered serif header, double hairline rule under each navy heading. Gravitas for senior candidates, no sidebar or color block.</span>
+          </div>
+        </button>
+
+      </div>
+
+      <div class="tpl-cta-bar">
+        <button type="button" class="btn btn-ghost" data-goto="role">Back</button>
+        <button type="button" class="btn btn-primary" id="tpl-continue" disabled>Generate resume</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 4 — RESULT ============ -->
+    <section id="screen-result" class="screen">
+      <div class="role-head" style="padding-bottom:0;">
+        <div class="eyebrow">Step 4 of 4</div>
+        <h1>Your resume is ready</h1>
+        <p>Built with the <strong id="result-tpl-name">Minimal Clean Tech</strong> template, matched against the role you gave us.</p>
+      </div>
+
+      <div class="result-shell">
+        <div>
+          <div class="workspace-tabs">
+            <button type="button" class="ws-tab active" data-tab="formatted">📄 Formatted Resume</button>
+            <button type="button" class="ws-tab" data-tab="latex">📜 LaTeX Code</button>
+            <button type="button" class="ws-tab" data-tab="pdf">📕 PDF Preview</button>
+          </div>
+
+          <div class="resume-toolbar">
+            <span class="fname" id="result-filename">resume_draft.pdf</span>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-ghost" id="btn-copy-latex" style="display:none;">📋 Copy LaTeX</button>
+              <button type="button" class="btn btn-ghost" id="btn-download-tex" style="display:none;">⬇️ Download .tex</button>
+              <button type="button" class="btn btn-ghost" id="btn-download-docx">📝 Download DOCX</button>
+              <button type="button" class="btn btn-primary" id="btn-download-pdf">📕 Download PDF</button>
+            </div>
+          </div>
+
+          <!-- TAB 1: Formatted Document -->
+          <div id="tab-content-formatted" class="ws-tab-content">
+            <div class="resume-frame" id="resume-frame" style="height:auto; min-height:800px; aspect-ratio:auto;">
+              <div class="rname" id="rf-name">Candidate Name</div>
+              <div class="rrole" id="rf-role">Target Role</div>
+              <div class="rcontact" id="rf-contact">email@domain.com · city, country</div>
+              <hr style="margin: 14px 0;">
+              <div id="rf-body" class="resume-formatted-doc">
+                <!-- Dynamically rendered resume sections -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: LaTeX Code -->
+          <div id="tab-content-latex" class="ws-tab-content hidden">
+            <pre class="code-editor" id="latex-code-display">% Generating LaTeX...</pre>
+          </div>
+
+          <!-- TAB 3: Real compiled PDF preview (shows the selected template) -->
+          <div id="tab-content-pdf" class="ws-tab-content hidden">
+            <iframe id="pdf-frame" title="Compiled PDF preview" style="width:100%; height:920px; border:1px solid var(--line); background:#fff; border-radius:var(--radius);"></iframe>
+            <p id="pdf-status" style="font-size:12.5px; color:var(--ink-soft); margin-top:8px;">This is the real compiled PDF — the template you picked is visible here.</p>
+          </div>
+        </div>
+
+        <aside class="score-card">
+          <div class="score-top">
+            <svg class="score-ring" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="var(--paper-dim)" stroke-width="10"/>
+              <circle id="ring-fill" cx="50" cy="50" r="42" fill="none" stroke="var(--good)" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 50 50)"/>
+              <text x="50" y="56" text-anchor="middle" font-family="Fraunces, serif" font-size="26" font-weight="600" fill="var(--ink)" id="ring-num">0</text>
+            </svg>
+            <div>
+              <div class="label">ATS match score</div>
+              <div class="verdict" id="score-verdict">Calculating…</div>
+            </div>
+          </div>
+
+          <div class="score-bars">
+            <div class="score-bar-row">
+              <div class="top"><span class="k">Keyword coverage</span><span id="score-kw-val">0%</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-kw-bar" style="width:0%;"></div></div>
+            </div>
+            <div class="score-bar-row">
+              <div class="top"><span class="k">AI Risk score</span><span id="score-ai-val">Low Risk</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-ai-bar" style="width:90%;"></div></div>
+            </div>
+            <div class="score-bar-row">
+              <div class="top"><span class="k">RAG Trust score</span><span id="score-rag-val">100%</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-rag-bar" style="width:100%;"></div></div>
+              <div id="verification-status-badge" style="font-size:11px;margin-top:4px;font-weight:600;"></div>
+            </div>
+            <div class="score-bar-row">
+              <div class="top"><span class="k">Quantified impact</span><span id="score-quant-val">100%</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-quant-bar" style="width:100%;"></div></div>
+            </div>
+            <div class="score-bar-row">
+              <div class="top"><span class="k">Parsability</span><span id="score-parse-val">100%</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-parse-bar" style="width:100%;"></div></div>
+            </div>
+            <div class="score-bar-row">
+              <div class="top"><span class="k">Content quality</span><span id="score-content-val">0%</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill good" id="score-content-bar" style="width:0%;"></div></div>
+            </div>
+          </div>
+
+          <div class="kw-list">
+            <h5>Matched from job description</h5>
+            <div id="kw-matched-container"></div>
+          </div>
+          <div class="kw-list">
+            <h5>Missing — required</h5>
+            <div id="kw-missing-container"></div>
+          </div>
+          <div class="kw-list">
+            <h5>Missing — preferred</h5>
+            <div id="kw-missing-preferred-container"></div>
+          </div>
+
+          <div class="kw-list" id="ats-warnings-list" style="display:none;">
+            <h5>Warnings</h5>
+            <div id="ats-warnings-container" style="font-size:12.5px; color:var(--ink-soft); line-height:1.5;"></div>
+          </div>
+
+          <div class="kw-list">
+            <h5>AI &amp; RAG Enhancements</h5>
+            <div id="improvements-container" style="font-size:12.5px; color:var(--ink-soft); line-height:1.5;"></div>
+          </div>
+
+          <p id="ats-disclaimer" style="font-size:11px; color:var(--ink-soft); margin-top:10px; line-height:1.4;"></p>
+
+          <div class="result-actions">
+            <button type="button" class="btn btn-ghost" data-goto="templates">Try another template</button>
+            <button type="button" class="btn btn-primary" id="btn-download">Download PDF</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script>
+var SUPABASE_URL = 'https://gmyrynnrfklgovariann.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteXJ5bm5yZmtsZ292YXJpYW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0Mzk0NTMsImV4cCI6MjEwNDAxNTQ1M30.pGlo6k01HMkC8yDpgpn8vas5mi3AJD4kGHm66iGQ6lw';
+
+(function(){
+const SB_URL = SUPABASE_URL;
+const SB_KEY = SUPABASE_ANON_KEY;
+
+// API endpoint resolution:
+// 1. Explicit FastAPI backend override
+// 2. Local development uses the local FastAPI service
+// 3. Hosted frontend uses the Supabase Edge Function and its server-side secrets
+function resolveBackendUrl() {
+  if (window.FASTAPI_BACKEND_URL) {
+    return window.FASTAPI_BACKEND_URL.replace(/\/+$/, "") + "/v1/generate";
+  }
+  try {
+    var custom = localStorage.getItem("RESUMEFORGE_BACKEND_URL");
+    if (custom) return custom.replace(/\/+$/, "") + "/v1/generate";
+  } catch(e) {}
+  var origin = window.location.origin || "";
+  if (origin.indexOf(":8000") !== -1) {
+    return "/v1/generate";
+  }
+  if (window.location.protocol === "file:" || origin.indexOf("localhost") !== -1 || origin.indexOf("127.0.0.1") !== -1) {
+    return "http://localhost:8000/v1/generate";
+  }
+  return SB_URL.replace(/\/+$/, "") + "/functions/v1/generate-resume";
+}
+const FN_URL = resolveBackendUrl();
+const USE_SUPABASE_FUNCTION = FN_URL.indexOf(SB_URL.replace(/\/+$/, "") + "/functions/v1/") === 0;
+var sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+  var order = ["account","role","templates","result"];
+  var unlocked = {account:true, role:false, templates:false, result:false};
+
+  function show(name){
+    order.forEach(function(n){
+      document.getElementById("screen-"+n).classList.toggle("active", n===name);
+    });
+    document.querySelectorAll(".step").forEach(function(btn){
+      var n = btn.getAttribute("data-goto");
+      btn.removeAttribute("aria-current");
+      btn.classList.remove("done");
+      if(n===name) btn.setAttribute("aria-current","step");
+      else if(unlocked[n] && order.indexOf(n) < order.indexOf(name)) btn.classList.add("done");
+      btn.disabled = !unlocked[n];
+    });
+    window.scrollTo({top:0, behavior:"instant" in window ? "instant":"auto"});
+  }
+
+  function unlockThrough(name){
+    var idx = order.indexOf(name);
+    for(var i=0;i<=idx;i++) unlocked[order[i]] = true;
+  }
+
+  document.querySelectorAll("[data-goto]").forEach(function(el){
+    el.addEventListener("click", function(){
+      var target = el.getAttribute("data-goto");
+      if(unlocked[target]) show(target);
+      // Returning to the templates screen forces a fresh, unambiguous
+      // selection every time — this is the single source of the
+      // "generates with the previous template" class of bug: any state
+      // where a card LOOKS selected (or selectedTpl points to a stale
+      // value) without the user re-confirming it on THIS visit is exactly
+      // what let a stale/previous choice silently carry into the next
+      // generation. Forcing a reset removes that possibility entirely.
+      if(target === "templates"){
+        selectedTpl = null;
+        document.querySelectorAll(".tpl-card").forEach(function(c){ c.classList.remove("selected"); });
+        var contBtn = document.getElementById("tpl-continue");
+        if(contBtn) contBtn.disabled = true;
+      }
+    });
+  });
+
+  /* ---------- Auth state ---------- */
+  function setSignedInUI(user){
+    document.getElementById("user-chip").classList.remove("hidden");
+    document.getElementById("user-email").textContent = (user && user.email) || "";
+  }
+  function setSignedOutUI(){
+    document.getElementById("user-chip").classList.add("hidden");
+  }
+
+  sb.auth.onAuthStateChange(function(_event, session){
+    if(session && session.user){ setSignedInUI(session.user); }
+    else { setSignedOutUI(); }
+  });
+
+  document.getElementById("sign-out-btn").addEventListener("click", async function(){
+    await sb.auth.signOut();
+    unlocked = {account:true, role:false, templates:false, result:false};
+    show("account");
+  });
+
+  async function init(){
+    var res = await sb.auth.getSession();
+    var session = res.data.session;
+    if(session){
+      setSignedInUI(session.user);
+      unlockThrough("role");
+      show("role");
+    } else {
+      show("account");
+    }
+  }
+
+  /* ---------- Screen 1: account tabs ---------- */
+  var mode = "signup";
+  document.querySelectorAll(".acct-tab").forEach(function(tab){
+    tab.addEventListener("click", function(){
+      document.querySelectorAll(".acct-tab").forEach(function(t){ t.classList.remove("active"); t.setAttribute("aria-selected","false"); });
+      tab.classList.add("active"); tab.setAttribute("aria-selected","true");
+      mode = tab.getAttribute("data-mode");
+      document.getElementById("acct-heading").textContent = mode==="signup" ? "Create your account" : "Welcome back";
+      document.getElementById("acct-submit").textContent = mode==="signup" ? "Create account" : "Log in";
+      document.querySelectorAll('[data-only="signup"]').forEach(function(f){ f.style.display = mode==="signup" ? "flex" : "none"; });
+      clearAcctError();
+    });
+  });
+
+  /* ---------- Screen 1: real auth wiring ---------- */
+  var acctForm = document.getElementById("acct-form");
+  var acctSubmit = document.getElementById("acct-submit");
+  var acctError = document.getElementById("acct-error");
+
+  function showAcctError(msg){
+    acctError.textContent = msg;
+    acctError.classList.remove("hidden");
+  }
+  function clearAcctError(){
+    acctError.textContent = "";
+    acctError.classList.add("hidden");
+  }
+
+  acctForm.addEventListener("submit", async function(e){
+    e.preventDefault();
+    clearAcctError();
+
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+    var fullnameField = document.getElementById("fullname");
+    var fullname = fullnameField ? fullnameField.value.trim() : "";
+
+    if(!email || !password){
+      showAcctError("Enter an email and password to continue.");
+      return;
+    }
+
+    acctSubmit.disabled = true;
+    var originalLabel = acctSubmit.textContent;
+    acctSubmit.textContent = mode === "signup" ? "Creating account…" : "Logging in…";
+
+    try{
+      if(mode === "signup"){
+        var signUpRes = await sb.auth.signUp({
+          email: email,
+          password: password,
+          options: { data: { full_name: fullname } }
+        });
+        if(signUpRes.error){ showAcctError(signUpRes.error.message); return; }
+        if(!signUpRes.data.session){
+          showAcctError("Account created — check your email to confirm it, then log in below.");
+          document.querySelector('.acct-tab[data-mode="login"]').click();
+          return;
+        }
+      } else {
+        var signInRes = await sb.auth.signInWithPassword({ email: email, password: password });
+        if(signInRes.error){ showAcctError(signInRes.error.message); return; }
+      }
+      unlockThrough("role");
+      show("role");
+    } catch(err){
+      showAcctError("Something went wrong reaching the server. Please try again.");
+    } finally {
+      acctSubmit.disabled = false;
+      acctSubmit.textContent = originalLabel;
+    }
+  });
+
+  document.querySelectorAll(".oauth-btn").forEach(function(btn){
+    btn.addEventListener("click", async function(){
+      clearAcctError();
+      var provider = btn.getAttribute("data-provider");
+      if(!provider) return;
+      var res = await sb.auth.signInWithOAuth({ provider: provider, options: { redirectTo: window.location.href } });
+      if(res.error){ showAcctError(res.error.message); }
+      // On success the browser navigates away to the provider, then back —
+      // init() on reload picks the session back up.
+    });
+  });
+
+  /* ---------- Screen 2: role & resume ---------- */
+  var zone = document.getElementById("upload-zone");
+  var fileInput = document.getElementById("resume-file");
+  var uploadTitle = document.getElementById("upload-title");
+  var uploadedResumeText = ""; // text extracted from the uploaded file
+
+  // Extract real text from an uploaded resume file (TXT / PDF / DOCX).
+  // PDFs are parsed with pdf.js, DOCX with mammoth.
+  async function extractResumeFromFile(file){
+    var name = (file.name || "").toLowerCase();
+    try {
+      if(name.endsWith(".txt")){
+        return await file.text();
+      }
+      if(name.endsWith(".pdf")){
+        if(!window.pdfjsLib) return "";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        var pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        var out = [];
+        for(var i = 1; i <= pdf.numPages; i++){
+          var pg = await pdf.getPage(i);
+          var tc = await pg.getTextContent();
+          out.push(tc.items.map(function(it){ return it.str; }).join(" "));
+        }
+        var text = out.join("\n").replace(/\s{2,}/g, " ").trim();
+        if(text.length < 40) return ""; // scanned/image-only PDF — no text layer
+        return text;
+      }
+      if(name.endsWith(".docx")){
+        if(!window.mammoth) return "";
+        var res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+        return (res.value || "").trim();
+      }
+      if(name.endsWith(".doc")){
+        return ""; // legacy binary .doc cannot be parsed in-browser — ask user to save as .docx/.txt
+      }
+    } catch(e){
+      console.error("File extraction failed:", e);
+      return "";
+    }
+    return "";
+  }
+
+  zone.addEventListener("click", function(){ fileInput.click(); });
+  zone.addEventListener("keydown", function(e){ if(e.key==="Enter" || e.key===" "){ e.preventDefault(); fileInput.click(); } });
+  ["dragenter","dragover"].forEach(function(ev){
+    zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.add("drag"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.remove("drag"); });
+  });
+  zone.addEventListener("drop", function(e){
+    if(e.dataTransfer.files.length){
+      fileInput.files = e.dataTransfer.files;
+      handleResumeFile(e.dataTransfer.files[0]);
+    }
+  });
+  async function handleResumeFile(file){
+    if(!file) return;
+    uploadedResumeText = "";
+    var name = file.name || "Resume file";
+    if(file.size > 8 * 1024 * 1024){
+      uploadTitle.textContent = name + " — file is over 8MB; choose a smaller file";
+      return;
+    }
+    if(!/\.(txt|pdf|docx)$/i.test(name)){
+      uploadTitle.textContent = name + " — unsupported file; use .txt, .pdf, or .docx";
+      return;
+    }
+    uploadTitle.textContent = name + " — extracting text…";
+    var extracted = await extractResumeFromFile(file);
+    if(extracted){
+      uploadedResumeText = extracted;
+      uploadTitle.textContent = name + " — text extracted";
+    } else {
+      uploadTitle.textContent = name + " — could not extract text; paste your resume below";
+    }
+  }
+  fileInput.addEventListener("change", function(){
+    if(fileInput.files.length) handleResumeFile(fileInput.files[0]);
+  });
+  function showFileName(file){
+    uploadTitle.textContent = file.name || "Resume selected";
+  }
+
+  var jd = document.getElementById("jd");
+  jd.addEventListener("input", function(){
+    document.getElementById("jd-count").textContent = jd.value.length + " characters";
+  });
+
+  document.getElementById("role-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    unlockThrough("templates");
+    show("templates");
+  });
+
+  /* ---------- Screen 3: Generate resume (REAL PIPELINE) ---------- */
+  var selectedTpl = null;
+  document.querySelectorAll(".tpl-card").forEach(function(card){
+    card.addEventListener("click", function(){
+      document.querySelectorAll(".tpl-card").forEach(function(c){ c.classList.remove("selected"); });
+      card.classList.add("selected");
+      selectedTpl = card.getAttribute("data-tpl");
+      document.getElementById("tpl-continue").disabled = false;
+    });
+  });
+
+  // Map UI template names → backend format keys
+  // Every card below maps 1:1 to its own backend template — 8 unique
+  // templates, each with its own dedicated card and real PDF preview.
+  var TPL_MAP = {
+    // ── 8 templates, mapped 1:1 to backend template IDs ──
+    "Modern CV": "moderncv-classic",
+    "Minimal Clean Tech": "minimal-clean-tech",
+    "FAANG-Style Compact": "faang-style-compact",
+    "Bold Header Modern": "bold-header-modern",
+    "Ultra-Clean One-Page": "ultra-clean-one-page",
+    "Tech-Focused Dense": "tech-focused-dense",
+    "Premium Minimalist": "premium-minimalist",
+    "Executive": "structured-executive-brief"
+  };
+
+  // Reverse map: backend format key -> pretty card name (for accurate
+  // display of the template the backend actually rendered with).
+  var TPL_PRETTY = {};
+  Object.keys(TPL_MAP).forEach(function(k){ TPL_PRETTY[TPL_MAP[k]] = k; });
+
+  // Global storage for generated data
+  var generatedData = null;
+  var generating = false;      // duplicate-submission lock for the Generate button
+  var lastPdfObjectUrl = null; // revoked + replaced fresh on every generation
+
+  /* ---------- Progress Modal Helpers ---------- */
+  var modalEl = null;
+  var stepEls = [];
+
+  function showProgressModal(){
+    if(modalEl) return;
+    modalEl = document.createElement("div");
+    modalEl.className = "modal-overlay";
+    modalEl.innerHTML = '<div class="modal-card">' +
+      '<div class="loader-spinner"></div>' +
+      '<h2 style="font-family:var(--serif);font-size:22px;margin:0 0 6px;">Generating your resume</h2>' +
+      '<p style="color:var(--ink-soft);font-size:13.5px;margin:0;">This takes 30–60 seconds. The AI is running 4 passes.</p>' +
+      '<div class="loader-steps">' +
+        '<div class="loader-step" id="lstep-1"><span>⬤</span> Phase 1 — Analyzing candidate</div>' +
+        '<div class="loader-step" id="lstep-2"><span>⬤</span> Phase 2 — Optimizing resume</div>' +
+        '<div class="loader-step" id="lstep-3"><span>⬤</span> Phase 3 — ATS analysis</div>' +
+        '<div class="loader-step" id="lstep-4"><span>⬤</span> Phase 4 — Finalizing resume</div>' +
+        '<div class="loader-step" id="lstep-5"><span>⬤</span> Generating PDF</div>' +
+      '</div>' +
+    '</div>';
+    document.body.appendChild(modalEl);
+    stepEls = [1,2,3,4,5].map(function(i){ return document.getElementById("lstep-" + i); });
+  }
+
+  function setStep(n){
+    stepEls.forEach(function(el, i){
+      el.classList.remove("active","done");
+      if(i < n-1) el.classList.add("done");
+      else if(i === n-1) el.classList.add("active");
+    });
+  }
+
+  function hideProgressModal(){
+    if(modalEl){ modalEl.remove(); modalEl = null; }
+  }
+
+  /* ---------- Render the real resume JSON into the formatted doc ---------- */
+  function renderResumeDoc(rj){
+    var rfName = document.getElementById("rf-name");
+    var rfRole = document.getElementById("rf-role");
+    var rfContact = document.getElementById("rf-contact");
+    var rfBody = document.getElementById("rf-body");
+
+    rfName.textContent = rj.name || "";
+    rfRole.textContent = document.getElementById("job-title").value || "";
+    rfContact.textContent = rj.contact || "";
+
+    var html = "";
+
+    // Summary
+    if(rj.summary){
+      html += '<h3>PROFESSIONAL SUMMARY</h3>';
+      html += '<p style="font-size:13px;line-height:1.6;color:var(--ink);margin:0 0 4px;">' + escHtml(rj.summary) + '</p>';
+    }
+
+    // Experience
+    if(rj.experience && rj.experience.length){
+      html += '<h3>EXPERIENCE</h3>';
+      rj.experience.forEach(function(job){
+        html += '<div class="job-item">';
+        html += '<div class="title-row"><span>' + escHtml(job.title) + ' — ' + escHtml(job.company) + '</span><span>' + escHtml(job.dates) + '</span></div>';
+        html += '<div class="meta-row"><span>' + escHtml(job.location) + '</span></div>';
+        if(job.bullets && job.bullets.length){
+          html += '<ul class="bullet-list">';
+          job.bullets.forEach(function(b){ html += '<li>' + escHtml(b) + '</li>'; });
+          html += '</ul>';
+        }
+        html += '</div>';
+      });
+    }
+
+    // Education
+    if(rj.education && rj.education.length){
+      html += '<h3>EDUCATION</h3>';
+      rj.education.forEach(function(edu){
+        html += '<div class="job-item">';
+        html += '<div class="title-row"><span>' + escHtml(edu.degree) + '</span><span>' + escHtml(edu.dates) + '</span></div>';
+        html += '<div class="meta-row"><span>' + escHtml(edu.school) + (edu.location ? ' · ' + escHtml(edu.location) : '') + '</span></div>';
+        if(edu.details){ html += '<p style="font-size:12px;color:var(--ink-soft);margin:2px 0 0;">' + escHtml(edu.details) + '</p>'; }
+        html += '</div>';
+      });
+    }
+
+    // Projects
+    if(rj.projects && rj.projects.length){
+      html += '<h3>PROJECTS</h3>';
+      rj.projects.forEach(function(p){
+        html += '<div class="job-item">';
+        html += '<div class="title-row"><span>' + escHtml(p.name) + '</span>' + (p.link ? '<span style="font-size:11px;font-family:var(--mono);color:var(--brand);">' + escHtml(p.link) + '</span>' : '') + '</div>';
+        if(p.tech){ html += '<div class="meta-row"><span>' + escHtml(p.tech) + '</span></div>'; }
+        if(p.bullets && p.bullets.length){
+          html += '<ul class="bullet-list">';
+          p.bullets.forEach(function(b){ html += '<li>' + escHtml(b) + '</li>'; });
+          html += '</ul>';
+        }
+        html += '</div>';
+      });
+    }
+
+    // Skills
+    if(rj.skills){
+      html += '<h3>TECHNICAL SKILLS</h3>';
+      Object.entries(rj.skills).forEach(function(entry){
+        html += '<div class="skills-group"><strong>' + escHtml(entry[0]) + ':</strong> ' + escHtml((entry[1] || []).join(', ')) + '</div>';
+      });
+    }
+
+    // Certifications
+    if(rj.certifications && rj.certifications.length){
+      html += '<h3>CERTIFICATIONS</h3>';
+      html += '<ul class="bullet-list">';
+      rj.certifications.forEach(function(c){ html += '<li>' + escHtml(c) + '</li>'; });
+      html += '</ul>';
+    }
+
+    rfBody.innerHTML = html;
+  }
+
+  function escHtml(s){
+    if(!s) return "";
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  /* ---------- Render real scores from API response ---------- */
+  function renderScores(data){
+    var ats = data.atsScore || {};
+    var aiRisk = data.aiRisk || {};
+    var ragResult = data.ragResult || {};
+    var keywords = data.keywords || {};
+
+    var totalScore = ats.score || 0;
+    var circumference = 264;
+    var ring = document.getElementById("ring-fill");
+    var numEl = document.getElementById("ring-num");
+
+    // Animate ATS ring
+    var startTime = null;
+    function animateRing(ts){
+      if(!startTime) startTime = ts;
+      var progress = Math.min((ts-startTime)/1200, 1);
+      var eased = 1 - Math.pow(1-progress, 3);
+      var val = Math.round(eased * totalScore);
+      numEl.textContent = val;
+      ring.setAttribute("stroke-dashoffset", circumference - (circumference * eased * (totalScore/100)));
+      ring.style.stroke = totalScore >= 80 ? "var(--good)" : totalScore >= 60 ? "var(--gold)" : "#A2503E";
+      if(progress < 1) requestAnimationFrame(animateRing);
+    }
+    requestAnimationFrame(animateRing);
+
+    // Verdict
+    var verdict = totalScore >= 85 ? "Strong match — send it" :
+                  totalScore >= 70 ? "Good match — minor tweaks" :
+                  totalScore >= 50 ? "Partial match — review gaps" : "Low match — needs work";
+    document.getElementById("score-verdict").textContent = verdict;
+
+    // Score bars — keyword coverage (use must_have_coverage from API)
+    var kwPct = ats.must_have_coverage || Math.round((ats.must_have_coverage || 0));
+    document.getElementById("score-kw-val").textContent = kwPct + "%";
+    setTimeout(function(){ document.getElementById("score-kw-bar").style.width = kwPct + "%"; }, 150);
+    document.getElementById("score-kw-bar").className = "score-bar-fill " + (kwPct >= 75 ? "good" : "warn");
+
+    // AI Risk bar (lower score = safer, so invert for display)
+    var aiLabel = aiRisk.level || "Low";
+    var aiPct = aiLabel === "Low" ? 90 : aiLabel === "Medium" ? 55 : 20;
+    document.getElementById("score-ai-val").textContent = aiLabel + " Risk";
+    setTimeout(function(){ document.getElementById("score-ai-bar").style.width = aiPct + "%"; }, 240);
+    document.getElementById("score-ai-bar").className = "score-bar-fill " + (aiLabel === "Low" ? "good" : aiLabel === "Medium" ? "warn" : "");
+
+    // RAG Trust
+    var ragPct = ragResult.trust_score || 100;
+    document.getElementById("score-rag-val").textContent = ragPct + "%";
+    setTimeout(function(){ document.getElementById("score-rag-bar").style.width = ragPct + "%"; }, 330);
+    document.getElementById("score-rag-bar").className = "score-bar-fill " + (ragPct >= 80 ? "good" : "warn");
+
+    // Honest verification badge — never shows "Verified" unless Pass 4's
+    // AI verification actually completed. Driven by the backend's
+    // explicit verificationStatus/humanizationStatus fields (see types.ts)
+    // rather than inferred client-side, so a failed pass can't accidentally
+    // render as success.
+    var badge = document.getElementById("verification-status-badge");
+    if (badge) {
+      var vStatus = data.verificationStatus || "PARTIALLY_VERIFIED";
+      var vLabelMap = {
+        VERIFIED: ["✓ Verified against your original resume", "var(--good)"],
+        PARTIALLY_VERIFIED: ["⚠ Partially verified — review flagged items below", "var(--warn, #b8860b)"],
+        VERIFICATION_INCOMPLETE: ["⚠ AI verification pass did not complete — only basic checks ran", "var(--warn, #b8860b)"]
+      };
+      var vInfo = vLabelMap[vStatus] || vLabelMap.PARTIALLY_VERIFIED;
+      badge.textContent = vInfo[0];
+      badge.style.color = vInfo[1];
+      if (data.humanizationStatus === "failed") {
+        badge.textContent += " · humanization step did not complete";
+      }
+    }
+
+    // Quantified impact — real share of experience bullets that contain a metric
+    var expBullets = [];
+    (data.resumeJSON && data.resumeJSON.experience || []).forEach(function(j){ (j.bullets||[]).forEach(function(b){ expBullets.push(b); }); });
+    var metricBullets = expBullets.filter(function(b){ return /\d/.test(b); });
+    var quantPct = expBullets.length ? Math.round(metricBullets.length / expBullets.length * 100) : 80;
+    document.getElementById("score-quant-val").textContent = quantPct + "%";
+    setTimeout(function(){ document.getElementById("score-quant-bar").style.width = quantPct + "%"; }, 420);
+    document.getElementById("score-quant-bar").className = "score-bar-fill " + (quantPct >= 70 ? "good" : "warn");
+
+    // Keywords matched
+    var matched = (keywords.must_have || []).concat(keywords.important || []).slice(0, 8);
+    var matchedContainer = document.getElementById("kw-matched-container");
+    matchedContainer.innerHTML = matched.map(function(k){ return '<span class="kw">' + escHtml(k) + '</span>'; }).join("");
+
+    // Keywords missing — required vs preferred are reported separately
+    // (a missing "required" skill matters far more than a missing
+    // "preferred" one, so they shouldn't be shown as one flat list).
+    var missingRequired = (ats.required_skills_missing || ats.keywords_missing || []).slice(0, 6);
+    var missingContainer = document.getElementById("kw-missing-container");
+    missingContainer.innerHTML = missingRequired.length
+      ? missingRequired.map(function(k){ return '<span class="kw missing">' + escHtml(k) + '</span>'; }).join("")
+      : '<span style="font-size:12px;color:var(--good);">All required terms covered ✓</span>';
+
+    var missingPreferred = (ats.preferred_skills_missing || []).slice(0, 6);
+    var missingPrefContainer = document.getElementById("kw-missing-preferred-container");
+    if (missingPrefContainer) {
+      missingPrefContainer.innerHTML = missingPreferred.length
+        ? missingPreferred.map(function(k){ return '<span class="kw missing">' + escHtml(k) + '</span>'; }).join("")
+        : '<span style="font-size:12px;color:var(--good);">All preferred terms covered ✓</span>';
+    }
+
+    // Parsability + Content quality — the two other legs of the
+    // three-score architecture (see scoring/ats-score.ts). Fall back
+    // gracefully if an older cached response doesn't have them yet.
+    var parsePct = (typeof ats.parsabilityScore === "number") ? ats.parsabilityScore : 100;
+    var parseValEl = document.getElementById("score-parse-val");
+    var parseBarEl = document.getElementById("score-parse-bar");
+    if (parseValEl && parseBarEl) {
+      parseValEl.textContent = parsePct + "%";
+      setTimeout(function(){ parseBarEl.style.width = parsePct + "%"; }, 480);
+      parseBarEl.className = "score-bar-fill " + (parsePct >= 80 ? "good" : "warn");
+    }
+
+    var contentPct = (typeof ats.contentQualityScore === "number") ? ats.contentQualityScore : quantPct;
+    var contentValEl = document.getElementById("score-content-val");
+    var contentBarEl = document.getElementById("score-content-bar");
+    if (contentValEl && contentBarEl) {
+      contentValEl.textContent = contentPct + "%";
+      setTimeout(function(){ contentBarEl.style.width = contentPct + "%"; }, 540);
+      contentBarEl.className = "score-bar-fill " + (contentPct >= 70 ? "good" : "warn");
+    }
+
+    // Warnings — parsing + content-quality warnings from the backend,
+    // shown together so a low sub-score is always explainable rather
+    // than just a number.
+    var warningsList = document.getElementById("ats-warnings-list");
+    var warningsContainer = document.getElementById("ats-warnings-container");
+    var allWarnings = (ats.parsing_warnings || []).concat(ats.content_warnings || []);
+    if (warningsList && warningsContainer) {
+      if (allWarnings.length) {
+        warningsContainer.innerHTML = allWarnings.slice(0, 8).map(function(w){
+          return '<div style="margin-bottom:5px;">⚠ ' + escHtml(w) + '</div>';
+        }).join("");
+        warningsList.style.display = "";
+      } else {
+        warningsList.style.display = "none";
+      }
+    }
+
+    // Disclaimer — this is an estimated match score, not a universal
+    // ATS pass/fail guarantee. Always shown, not just on request.
+    var disclaimerEl = document.getElementById("ats-disclaimer");
+    if (disclaimerEl) {
+      disclaimerEl.textContent = ats.disclaimer ||
+        "This is an estimated ATS match score for this job description, not a universal ATS score.";
+    }
+
+    // Improvements
+    var improvements = data.improvements || [];
+    var impContainer = document.getElementById("improvements-container");
+    impContainer.innerHTML = improvements.slice(0, 6).map(function(imp){
+      return '<div style="margin-bottom:5px;">' + escHtml(imp) + '</div>';
+    }).join("") || '<span style="color:var(--good);">No issues detected ✓</span>';
+  }
+
+  /* ---------- Workspace tab switching ---------- */
+  document.querySelectorAll(".ws-tab").forEach(function(tab){
+    tab.addEventListener("click", function(){
+      document.querySelectorAll(".ws-tab").forEach(function(t){ t.classList.remove("active"); });
+      tab.classList.add("active");
+      var targetTab = tab.getAttribute("data-tab");
+      document.querySelectorAll(".ws-tab-content").forEach(function(c){ c.classList.add("hidden"); });
+      document.getElementById("tab-content-" + targetTab).classList.remove("hidden");
+      // Show/hide relevant toolbar buttons
+      var isLatex = targetTab === "latex";
+      document.getElementById("btn-copy-latex").style.display = isLatex ? "inline-flex" : "none";
+      document.getElementById("btn-download-tex").style.display = isLatex ? "inline-flex" : "none";
+    });
+  });
+
+  /* ---------- "Generate resume" button — REAL PIPELINE ---------- */
+  document.getElementById("tpl-continue").addEventListener("click", async function(){
+    // Prevent accidental double submission (double-click / duplicate job).
+    if(generating){ return; }
+
+    // Defensive re-read: trust the DOM's actual "selected" card over the
+    // closure variable, in case navigation ever left them out of sync.
+    var selectedCard = document.querySelector(".tpl-card.selected");
+    if(selectedCard) selectedTpl = selectedCard.getAttribute("data-tpl");
+    if(!selectedTpl){ alert("Please select a template first."); return; }
+
+    var fmtKey = TPL_MAP[selectedTpl];
+    if(!fmtKey){
+      alert("Selected template isn't recognized by the backend — please pick another one.");
+      return;
+    }
+
+    generating = true;
+    this.disabled = true;
+
+    // One generation_id per resume job, created fresh for this click only.
+    var currentGenerationId = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : ("rf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10));
+
+    // Collect form data
+    var jdText = document.getElementById("jd").value.trim();
+    var linkedinUrl = (document.getElementById("linkedin") || {value:""}).value.trim();
+    var jobTitleVal = document.getElementById("job-title").value.trim();
+    var nameVal = (document.getElementById("fullname") || {value:""}).value.trim();
+
+    // Read resume text: extracted from the uploaded file, else pasted text
+    var resumeText = (uploadedResumeText || "").trim();
+    var pasteArea = document.getElementById("resume-text");
+    if(!resumeText && pasteArea) resumeText = pasteArea.value.trim();
+
+    if(!jdText || jdText.length < 50){
+      alert("Please paste a complete job description (minimum 50 characters).");
+      generating = false;
+      document.getElementById("tpl-continue").disabled = false;
+      return;
+    }
+    if(!resumeText || resumeText.length < 80){
+      // If no file uploaded and no text, generate a fallback placeholder
+      resumeText = "Name: " + (nameVal || "Candidate") +
+        "\nTarget Role: " + (jobTitleVal || "Professional") +
+        "\nExperience: Please upload your resume file or note experience manually." +
+        "\nSkills: To be extracted from job description context.";
+    }
+
+    var format = fmtKey; // fixed for the lifetime of THIS job — never re-read mid-flight
+    var atsTarget = "generic";
+
+    unlockThrough("result");
+    // Show the selection immediately, but the label is corrected to the
+    // backend-confirmed template as soon as the response arrives — the
+    // backend's `template_name` is always the source of truth for what
+    // was actually rendered.
+    document.getElementById("result-tpl-name").textContent = selectedTpl;
+    document.getElementById("result-filename").textContent = (nameVal||"Resume").trim().split(/\s+/).join("_") + "_Resume.pdf";
+    show("result");
+
+    // Clear any previous PDF before this job starts, so a slow network
+    // can never leave a stale (previous-template) PDF visible while the
+    // new one is generating.
+    var pdfFrame = document.getElementById("pdf-frame");
+    if(pdfFrame){ pdfFrame.src = "about:blank"; }
+
+    // Show loading modal
+    showProgressModal();
+
+    // Simulate step progression while waiting
+    setStep(1);
+    var stepTimer = 1;
+    var stepInterval = null;
+    var phasePollInFlight = false;
+
+    try {
+      // Get current session for auth token
+      var session = (await sb.auth.getSession()).data.session;
+      var authToken = session ? session.access_token : null;
+
+      var headers = { "Content-Type": "application/json" };
+      if(USE_SUPABASE_FUNCTION) headers.apikey = SB_KEY;
+      if(authToken) headers["Authorization"] = "Bearer " + authToken;
+
+      // Allow setting X-API-Key via window.RESUMEFORGE_API_KEY or localStorage
+      var customApiKey = window.RESUMEFORGE_API_KEY || (function(){
+        try { return localStorage.getItem("RESUMEFORGE_API_KEY"); } catch(e){ return null; }
+      })();
+      if(customApiKey && !USE_SUPABASE_FUNCTION) headers["X-API-Key"] = customApiKey;
+
+      async function pollPhaseProgress(){
+        if(phasePollInFlight) return;
+        phasePollInFlight = true;
+        try {
+          var phases = null;
+          if(USE_SUPABASE_FUNCTION){
+            var statusResult = await sb.from("generation_jobs").select("record").eq("generation_id", currentGenerationId).maybeSingle();
+            if(!statusResult.error && statusResult.data && statusResult.data.record){
+              phases = statusResult.data.record.phases;
+            }
+          } else {
+            var statusUrl = FN_URL.replace(/\/v1\/generate\/?$/, "/v1/jobs/" + encodeURIComponent(currentGenerationId));
+            var statusResponse = await fetch(statusUrl, { headers: headers, cache: "no-store" });
+            if(statusResponse.ok){
+              var statusData = await statusResponse.json();
+              phases = statusData.phases;
+            }
+          }
+          if(phases){
+            for(var phaseNumber = 1; phaseNumber <= 4; phaseNumber++){
+              var phase = phases[phaseNumber] || phases[String(phaseNumber)] || {};
+              if(phase.status !== "COMPLETED" && phase.status !== "FAILED"){
+                setStep(phaseNumber);
+                return;
+              }
+            }
+            setStep(5);
+          }
+        } catch(e) {
+          // Status polling is best-effort; generation continues independently.
+        } finally {
+          phasePollInFlight = false;
+        }
+      }
+      pollPhaseProgress();
+      stepInterval = setInterval(pollPhaseProgress, 2000);
+
+      var res = await fetch(FN_URL, {
+        method: "POST",
+        headers: headers,
+        cache: "no-store",
+        body: JSON.stringify({
+          resume: resumeText,
+          job: jdText,
+          linkedin: linkedinUrl || null,
+          ats_target: atsTarget,
+          format: format,
+          tone: "professional",
+          generation_id: currentGenerationId,
+          target: jobTitleVal || ""
+        })
+      });
+
+      clearInterval(stepInterval);
+      setStep(5);
+
+      if(!res.ok){
+        var errData = await res.json().catch(function(){ return {error: "Unknown server error"}; });
+        var errMsg = errData.error || errData.detail || ("Server error " + res.status);
+        if(errData.contentFiltered){
+          errMsg = "AI Content Safety Refusal: " + errMsg;
+        }
+        var rlErr = new Error(errMsg);
+        rlErr.rateLimited = !!errData.rateLimited;
+        rlErr.contentFiltered = !!errData.contentFiltered;
+        throw rlErr;
+      }
+
+      var data = await res.json();
+      hideProgressModal();
+
+      if(!data.success){
+        throw new Error(data.error || "Resume generation failed. Please try again.");
+      }
+
+      generatedData = data;
+
+      // The backend echoes back the template it ACTUALLY rendered with —
+      // always display that, never the locally-selected guess, so the
+      // label and the PDF can never disagree.
+      document.getElementById("result-tpl-name").textContent = TPL_PRETTY[data.template_name] || selectedTpl;
+
+      // Render real resume document
+      renderResumeDoc(data.resumeJSON);
+
+      // Show LaTeX in code view
+      if(data.latex){
+        document.getElementById("latex-code-display").textContent = data.latex;
+      }
+
+      // Render real scores
+      renderScores(data);
+
+      // Preview the real compiled PDF (a fresh Blob URL every time — the
+      // frame was already cleared to about:blank above, and each job gets
+      // its own unique blob: URL so there is no possibility of the viewer
+      // rendering a previous job's cached content).
+      if(data.pdfBase64){
+        try {
+          var pdfB64 = atob(data.pdfBase64);
+          var pdfArr = new Uint8Array(pdfB64.length);
+          for(var pi=0; pi<pdfB64.length; pi++) pdfArr[pi] = pdfB64.charCodeAt(pi);
+          if(lastPdfObjectUrl){ URL.revokeObjectURL(lastPdfObjectUrl); }
+          lastPdfObjectUrl = URL.createObjectURL(new Blob([pdfArr], {type:"application/pdf"}));
+          document.getElementById("pdf-frame").src = lastPdfObjectUrl;
+          document.getElementById("pdf-status").textContent = "PDF compiled successfully.";
+        } catch(e){
+          console.error("PDF preview failed", e);
+          document.getElementById("pdf-status").textContent = "PDF preview could not be opened. Use Download PDF or retry generation.";
+        }
+      } else {
+        document.getElementById("pdf-status").textContent = data.pdfError || "PDF compilation was unavailable. Download the LaTeX file or retry generation.";
+      }
+
+      // The formatted tab is a content-only preview; the selected design is
+      // visible in the compiled PDF, so open that tab after successful render.
+      if(data.pdfBase64){
+        var pdfTab = document.querySelector('.ws-tab[data-tab="pdf"]');
+        if(pdfTab) pdfTab.click();
+      }
+
+      generating = false;
+      document.getElementById("tpl-continue").disabled = false;
+
+    } catch(err){
+      clearInterval(stepInterval);
+      hideProgressModal();
+      generating = false;
+      document.getElementById("tpl-continue").disabled = false;
+
+      // Graceful error — show inline error in result pane. Rate-limit
+      // errors get a friendlier, accurate hint instead of the generic
+      // "check your deployment" tip, which doesn't apply here.
+      var errHint = err.rateLimited
+        ? '<em>This isn\'t a bug in your setup — the AI provider\'s rate limit was hit. Waiting a minute before trying again usually resolves it.</em>'
+        : USE_SUPABASE_FUNCTION
+          ? '<em>Check that the Supabase Edge Function is deployed and at least one AI provider key is set in Supabase secrets. See Edge Function logs for provider details.</em>'
+          : '<em>Check the local FastAPI terminal for provider details and verify GEMINI_API_KEY and GROQ_API_KEY are set in the project .env file.</em>';
+      document.getElementById("rf-body").innerHTML =
+        '<div style="background:#F2E3E0;border:1px solid #E5C5BF;border-radius:4px;padding:20px;color:#7A3228;">' +
+        '<strong>' + (err.rateLimited ? "Temporarily rate-limited:" : "Generation error:") + '</strong><br>' + escHtml(err.message || String(err)) +
+        '<br><br>' + errHint +
+        '</div>';
+
+      document.getElementById("ring-num").textContent = "—";
+      document.getElementById("score-verdict").textContent = "Error";
+    }
+  });
+
+  /* ---------- Screen 4: Download handlers ---------- */
+  function downloadBlob(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
+  document.getElementById("btn-download-pdf").addEventListener("click", function(){
+    if(!generatedData || !generatedData.pdfBase64) {
+      alert("PDF not yet compiled. Please wait for generation to complete or check for errors.");
+      return;
+    }
+    var bytes = atob(generatedData.pdfBase64);
+    var arr = new Uint8Array(bytes.length);
+    for(var i=0;i<bytes.length;i++) arr[i] = bytes.charCodeAt(i);
+    var filename = document.getElementById("result-filename").textContent || "resume.pdf";
+    downloadBlob(new Blob([arr], {type:"application/pdf"}), filename);
+  });
+
+  document.getElementById("btn-download-docx").addEventListener("click", function(){
+    if(!generatedData || !generatedData.docxBase64) {
+      alert("DOCX not yet generated. Please wait for generation to complete.");
+      return;
+    }
+    var bytes = atob(generatedData.docxBase64);
+    var arr = new Uint8Array(bytes.length);
+    for(var i=0;i<bytes.length;i++) arr[i] = bytes.charCodeAt(i);
+    var filename = (document.getElementById("result-filename").textContent || "resume.docx").replace(".pdf", ".docx");
+    downloadBlob(new Blob([arr], {type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}), filename);
+  });
+
+  document.getElementById("btn-download-tex").addEventListener("click", function(){
+    if(!generatedData || !generatedData.latex){ alert("LaTeX not yet generated."); return; }
+    var filename = (document.getElementById("result-filename").textContent || "resume.tex").replace(".pdf", ".tex");
+    downloadBlob(new Blob([generatedData.latex], {type:"text/plain"}), filename);
+  });
+
+  document.getElementById("btn-copy-latex").addEventListener("click", function(){
+    if(!generatedData || !generatedData.latex){ alert("LaTeX not yet generated."); return; }
+    navigator.clipboard.writeText(generatedData.latex).then(function(){
+      var btn = document.getElementById("btn-copy-latex");
+      btn.textContent = "✅ Copied!";
+      setTimeout(function(){ btn.textContent = "📋 Copy LaTeX"; }, 2000);
+    });
+  });
+
+  // Legacy download button (in score sidebar)
+  document.getElementById("btn-download").addEventListener("click", function(){
+    document.getElementById("btn-download-pdf").click();
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
